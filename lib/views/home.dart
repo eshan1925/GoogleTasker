@@ -11,7 +11,8 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   List<FeedbackModel> feedbacks = [];
   getFeedbackFromSheet() async {
-    var raw = await http.get(Uri.parse("https://bit.ly/3wKY56b"));
+    var raw = await http.get(Uri.parse(
+        "https://script.googleusercontent.com/macros/echo?user_content_key=C91kSdLbXPoFKAY-YLbdUqioH1YTlbKRTziHd7PbhwweIiNwLEX3c7NHHISHIZq2WizxyKH7LKpY-vwCVdF5as3E9IqOzD7Cm5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnArUvaMnv7-LTPDsGvue1k5MSSKDTT_DYxALR5cLZ8Dx90fVoKk_1FEf3j6_7Dht1TaVTN6IJYtJYAzax7T2vzXsScRCUs5fVQ&lib=MdyXkmKV_jn7b4t1pnyxdpJsyNKQVxPkG#b"));
     var jsonFeedback = convert.jsonDecode(raw.body);
     print('Jason Feedback:\n $jsonFeedback');
     // feedbacks=jsonFeedback.map((json)=>FeedbackModel.fromJson(json));
@@ -44,12 +45,12 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.orangeAccent,
+        backgroundColor: Colors.blueAccent,
         centerTitle: true,
         title: Text(
-          'Tasks',
+          'Pending Tasks',
           style: TextStyle(
-            color: Colors.black,
+            color: Colors.white,
             letterSpacing: 2,
           ),
         ),
@@ -75,8 +76,8 @@ class _HomeState extends State<Home> {
 }
 
 // ignore: must_be_immutable
-class FeedbackTile extends StatelessWidget {
-  // ignore: non_constant_identifier_names
+class FeedbackTile extends StatefulWidget {
+
   var Timestamp;
   // ignore: non_constant_identifier_names
   var Assign;
@@ -99,47 +100,109 @@ class FeedbackTile extends StatelessWidget {
       this.submisssion_time,
       this.Type,
       this.Work});
+
+  @override
+  _FeedbackTileState createState() => _FeedbackTileState();
+}
+
+class _FeedbackTileState extends State<FeedbackTile> {
+  Color Condition(){
+    if(widget.Assign=='TASK'){
+      return Colors.lightGreen.shade300;
+    }
+    else{
+      return Colors.red.shade300;
+    }
+  }
+
+  bool checkedValue = false;
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-        child: Column(
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
+        SizedBox(height: 7),
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Container(
-              child: Text(
-                Sub_code,
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-            Container(
-              child: Text(
-                Type,
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-            Container(
-              child: Text(
-                Assign,
-                style: TextStyle(color: Colors.white),
+            Checkbox(value: checkedValue, onChanged: (bool? value) {
+              setState(() {
+                checkedValue = value!;
+              });
+            },),
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(5)),
+                  color: Condition(),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            child: Text(
+                              widget.Sub_code,
+                              style: TextStyle(
+                                  color: Colors.black87,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 17),
+                            ),
+                          ),
+                          Container(
+                            child: Text(
+                              widget.Type,
+                              style: TextStyle(
+                                  color: Colors.black87,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 17),
+                            ),
+                          ),
+                          Container(
+                            child: Text(
+                              widget.Assign,
+                              style: TextStyle(
+                                  color: Colors.black87,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 17),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        alignment: Alignment.bottomLeft,
+                        child: Text(
+                          widget.Work,
+                          style: TextStyle(color: Colors.black87),
+                        ),
+                      ),
+                      Container(
+                        alignment: Alignment.bottomLeft,
+                        child: Text(
+                          'Submission Date: ${widget.submission_date}',
+                          style: TextStyle(color: Colors.black87),
+                        ),
+                      ),
+                      Container(
+                        alignment: Alignment.bottomLeft,
+                        child: Text(
+                          'Submission Time: ${widget.submisssion_time}',
+                          style: TextStyle(color: Colors.black87),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ],
         ),
-        Container(
-          child: Text(
-            Work,
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
-        Container(
-          child: Text('Submission Date: $submission_date',style: TextStyle(color: Colors.white),),
-        ),
-        Container(
-          child: Text('Submission Time: $submisssion_time',style: TextStyle(color: Colors.white),),
-        )
       ],
-    ));
+    );
   }
 }
