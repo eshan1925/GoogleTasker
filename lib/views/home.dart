@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:googletasker/views/feedback_model.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
+// ignore: import_of_legacy_library_into_null_safe
+import 'package:url_launcher/url_launcher.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -9,16 +11,16 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  List<FeedbackModel> feedbacks = [];
-  getFeedbackFromSheet() async {
+  List<FeedbackModel> feedbacks = <FeedbackModel>[];
+  Future<List> getFeedbackFromSheet() async {
     var raw = await http.get(Uri.parse(
-        "https://script.googleusercontent.com/macros/echo?user_content_key=C91kSdLbXPoFKAY-YLbdUqioH1YTlbKRTziHd7PbhwweIiNwLEX3c7NHHISHIZq2WizxyKH7LKpY-vwCVdF5as3E9IqOzD7Cm5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnArUvaMnv7-LTPDsGvue1k5MSSKDTT_DYxALR5cLZ8Dx90fVoKk_1FEf3j6_7Dht1TaVTN6IJYtJYAzax7T2vzXsScRCUs5fVQ&lib=MdyXkmKV_jn7b4t1pnyxdpJsyNKQVxPkG#b"));
+        "https://script.google.com/macros/s/AKfycbydFtb3fFBp-Ev2ma4mu99dNcS88PDTUQiGkEYN5Fhztas5RZbOB4cf4hWv1IoHx97J/exec"));
     var jsonFeedback = convert.jsonDecode(raw.body);
-    print('Jason Feedback:\n $jsonFeedback');
     // feedbacks=jsonFeedback.map((json)=>FeedbackModel.fromJson(json));
     jsonFeedback.forEach((element) {
       print(element);
       FeedbackModel feedbackModel = new FeedbackModel();
+      feedbackModel.Checkedval = element['Checkedval'];
       feedbackModel.Sub_code = element['Sub_code'];
       feedbackModel.Assign = element['Assign'];
       feedbackModel.submisssion_time = element['submission_time'];
@@ -32,20 +34,32 @@ class _HomeState extends State<Home> {
       }
     });
     print('length of feedbacks: ${feedbacks.length}');
+    return feedbacks;
     // print('$feedbacks');
   }
 
   @override
   void initState() {
-    getFeedbackFromSheet();
     super.initState();
+    getFeedbackFromSheet();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          launch(
+              "https://docs.google.com/forms/d/e/1FAIpQLScoM54rXH3tNDb_EbP3KsG5gqC-1Lg4DPZhY2ntULbkrHNhiA/viewform");
+        },
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
+        backgroundColor: Colors.lightBlueAccent,
+      ),
       appBar: AppBar(
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: Colors.lightBlueAccent,
         centerTitle: true,
         title: Text(
           'Pending Tasks',
@@ -62,6 +76,7 @@ class _HomeState extends State<Home> {
             itemCount: feedbacks.length,
             itemBuilder: (context, index) {
               return FeedbackTile(
+                Checkedval: feedbacks[index].Checkedval,
                 Sub_code: feedbacks[index].Sub_code,
                 Type: feedbacks[index].Type,
                 Assign: feedbacks[index].Assign,
@@ -77,7 +92,9 @@ class _HomeState extends State<Home> {
 
 // ignore: must_be_immutable
 class FeedbackTile extends StatefulWidget {
-
+  // ignore: non_constant_identifier_names
+  var Checkedval;
+  // ignore: non_constant_identifier_names
   var Timestamp;
   // ignore: non_constant_identifier_names
   var Assign;
@@ -93,29 +110,48 @@ class FeedbackTile extends StatefulWidget {
   var submisssion_time;
   // ignore: non_constant_identifier_names
   FeedbackTile(
+      // ignore: non_constant_identifier_names
       {this.Timestamp,
+      // ignore: non_constant_identifier_names
       this.Assign,
+      // ignore: non_constant_identifier_names
       this.Sub_code,
+      // ignore: non_constant_identifier_names
       this.submission_date,
+      // ignore: non_constant_identifier_names
       this.submisssion_time,
+      // ignore: non_constant_identifier_names
       this.Type,
-      this.Work});
+      // ignore: non_constant_identifier_names
+      this.Work,
+      this.Checkedval});
 
   @override
   _FeedbackTileState createState() => _FeedbackTileState();
 }
 
 class _FeedbackTileState extends State<FeedbackTile> {
-  Color Condition(){
-    if(widget.Assign=='TASK'){
-      return Colors.lightGreen.shade300;
-    }
-    else{
-      return Colors.red.shade300;
+  // ignore: non_constant_identifier_names
+  Color Condition() {
+    if (widget.Checkedval == false) {
+      if (widget.Assign == 'TASK') {
+        return Colors.lightGreen.shade300;
+      } else {
+        return Colors.red.shade300;
+      }
+    } else {
+      return Colors.white12;
     }
   }
 
   bool checkedValue = false;
+  bool ticked() {
+    if (widget.Checkedval == true) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -127,11 +163,16 @@ class _FeedbackTileState extends State<FeedbackTile> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Checkbox(value: checkedValue, onChanged: (bool? value) {
-              setState(() {
-                checkedValue = value!;
-              });
-            },),
+            Checkbox(
+              value: ticked(),
+              onChanged: (bool? value) {
+                setState(() {
+                  checkedValue = !checkedValue;
+                });
+              },
+              checkColor: Colors.black,
+              activeColor: Colors.white,
+            ),
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
