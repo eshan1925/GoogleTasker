@@ -50,7 +50,7 @@ class _HomeState extends State<Home> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           launch(
-              "https://docs.google.com/forms/d/e/1FAIpQLScoM54rXH3tNDb_EbP3KsG5gqC-1Lg4DPZhY2ntULbkrHNhiA/viewform");
+              "https://docs.google.com/forms/d/e/1FAIpQLScoM54rXH3tNDb_EbP3KsG5gqC-1Lg4DPZhY2ntULbkrHNhiA/viewform1");
         },
         child: const Icon(
           Icons.add,
