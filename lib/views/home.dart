@@ -11,8 +11,8 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  List<FeedbackModel> feedbacks = <FeedbackModel>[];
-  Future<List> getFeedbackFromSheet() async {
+  Future<List<FeedbackModel>> getFeedbackFromSheet() async {
+    List<FeedbackModel> feedbacks = <FeedbackModel>[];
     var raw = await http.get(Uri.parse(
         "https://script.google.com/macros/s/AKfycbydFtb3fFBp-Ev2ma4mu99dNcS88PDTUQiGkEYN5Fhztas5RZbOB4cf4hWv1IoHx97J/exec"));
     var jsonFeedback = convert.jsonDecode(raw.body);
@@ -41,52 +41,59 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    getFeedbackFromSheet();
   }
 
+  ScrollController _controller = ScrollController();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          launch(
-              "https://docs.google.com/forms/d/e/1FAIpQLScoM54rXH3tNDb_EbP3KsG5gqC-1Lg4DPZhY2ntULbkrHNhiA/viewform1");
-        },
-        child: const Icon(
-          Icons.add,
-          color: Colors.white,
-        ),
-        backgroundColor: Colors.lightBlueAccent,
-      ),
-      appBar: AppBar(
-        backgroundColor: Colors.lightBlueAccent,
-        centerTitle: true,
-        title: Text(
-          'Pending Tasks',
-          style: TextStyle(
-            color: Colors.white,
-            letterSpacing: 2,
-          ),
-        ),
-        elevation: 5,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-      ),
-      body: Container(
-        child: ListView.builder(
-            itemCount: feedbacks.length,
-            itemBuilder: (context, index) {
-              return FeedbackTile(
-                Checkedval: feedbacks[index].Checkedval,
-                Sub_code: feedbacks[index].Sub_code,
-                Type: feedbacks[index].Type,
-                Assign: feedbacks[index].Assign,
-                Work: feedbacks[index].Work,
-                submission_date: feedbacks[index].submission_date,
-                submisssion_time: feedbacks[index].submisssion_time,
-              );
-            }),
-      ),
-    );
+    return FutureBuilder<List<FeedbackModel>>(
+        future: getFeedbackFromSheet(),
+        builder: (context, snapshot) {
+          final feedbacks = snapshot.data ?? [];
+          return Scaffold(
+            floatingActionButton: FloatingActionButton(
+              onPressed: () {
+                launch(
+                    "https://docs.google.com/forms/d/e/1FAIpQLScoM54rXH3tNDb_EbP3KsG5gqC-1Lg4DPZhY2ntULbkrHNhiA/viewform");
+              },
+              child: const Icon(
+                Icons.add,
+                color: Colors.white,
+              ),
+              backgroundColor: Colors.lightBlueAccent,
+            ),
+            appBar: AppBar(
+              backgroundColor: Colors.lightBlueAccent,
+              centerTitle: true,
+              title: Text(
+                'Pending Tasks',
+                style: TextStyle(
+                  color: Colors.white,
+                  letterSpacing: 2,
+                ),
+              ),
+              elevation: 5,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5)),
+            ),
+            body: Container(
+              child: ListView.builder(
+                  controller: _controller,
+                  itemCount: feedbacks.length,
+                  itemBuilder: (context, index) {
+                    return FeedbackTile(
+                      Checkedval: feedbacks[index].Checkedval,
+                      Sub_code: feedbacks[index].Sub_code,
+                      Type: feedbacks[index].Type,
+                      Assign: feedbacks[index].Assign,
+                      Work: feedbacks[index].Work,
+                      submission_date: feedbacks[index].submission_date,
+                      submisssion_time: feedbacks[index].submisssion_time,
+                    );
+                  }),
+            ),
+          );
+        });
   }
 }
 
