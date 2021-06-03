@@ -77,21 +77,26 @@ class _HomeState extends State<Home> {
                   borderRadius: BorderRadius.circular(5)),
             ),
             body: Container(
-              child: ListView.builder(
-                  controller: _controller,
-                  itemCount: feedbacks.length,
-                  itemBuilder: (context, index) {
-                    return FeedbackTile(
-                      Checkedval: feedbacks[index].Checkedval,
-                      Sub_code: feedbacks[index].Sub_code,
-                      Type: feedbacks[index].Type,
-                      Assign: feedbacks[index].Assign,
-                      Work: feedbacks[index].Work,
-                      submission_date: feedbacks[index].submission_date,
-                      submisssion_time: feedbacks[index].submisssion_time,
-                    );
-                  }),
-            ),
+                // ignore: unnecessary_null_comparison
+                child: (feedbacks != null)
+                    ? ListView.builder(
+                        controller: _controller,
+                        itemCount: feedbacks.length,
+                        itemBuilder: (context, index) {
+                          return FeedbackTile(
+                            Checkedval: feedbacks[index].Checkedval,
+                            Sub_code: feedbacks[index].Sub_code,
+                            Type: feedbacks[index].Type,
+                            Assign: feedbacks[index].Assign,
+                            Work: feedbacks[index].Work,
+                            submission_date: feedbacks[index].submission_date,
+                            submisssion_time: feedbacks[index].submisssion_time,
+                          );
+                        })
+                    : Center(
+                        child: CircularProgressIndicator(
+                        color: Colors.blue,
+                      ))),
           );
         });
   }
