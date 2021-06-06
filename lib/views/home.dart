@@ -64,7 +64,6 @@ class _HomeState extends State<Home> {
             ),
             appBar: AppBar(
               backgroundColor: Colors.lightBlueAccent,
-              centerTitle: true,
               title: Text(
                 'Pending Tasks',
                 style: TextStyle(
@@ -72,6 +71,34 @@ class _HomeState extends State<Home> {
                   letterSpacing: 2,
                 ),
               ),
+              actions: <Widget>[
+                Padding(
+                    padding: EdgeInsets.only(right: 20.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          ListView.builder(
+                              controller: _controller,
+                              itemCount: feedbacks.length,
+                              itemBuilder: (context, index) {
+                                return FeedbackTile(
+                                  Checkedval: feedbacks[index].Checkedval,
+                                  Sub_code: feedbacks[index].Sub_code,
+                                  Type: feedbacks[index].Type,
+                                  Assign: feedbacks[index].Assign,
+                                  Work: feedbacks[index].Work,
+                                  submission_date: feedbacks[index].submission_date,
+                                  submisssion_time: feedbacks[index].submisssion_time,
+                                );
+                              });
+                        });
+                      },
+                      child: Icon(
+                        Icons.refresh,
+                        size: 26.0,
+                      ),
+                    )),
+              ],
               elevation: 5,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(5)),
